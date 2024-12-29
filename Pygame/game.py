@@ -7,9 +7,10 @@ import sys
 pygame.init()
 
 # Constants
-WIDTH, HEIGHT = 1600, 900  # Updated window size
+WIDTH, HEIGHT = 1600, 1600  # Updated window size
 FPS = 60
-TILE_SIZE = 40  # Size of each tile in pixels
+TILE_SIZE = 80
+  # Size of each tile in pixels
 
 # Colors
 BLACK = (0, 0, 0)
@@ -25,7 +26,7 @@ pygame.display.set_caption("Pygame Game with Walls")
 clock = pygame.time.Clock()
 
 # Load images
-def load_image(path, scale=1):
+def load_image(path, scale=1.5):
     try:
         image = pygame.image.load(path).convert_alpha()
         if scale != 1:
@@ -45,37 +46,30 @@ if not os.path.exists(ASSETS_DIR):
     sys.exit(1)
 
 background_img = load_image(os.path.join(ASSETS_DIR, 'images.png'), scale=8)
-player_img = load_image(os.path.join(ASSETS_DIR, 'player.png'), scale=0.25)
+player_img = load_image(os.path.join(ASSETS_DIR, 'player.png'), scale=0.5)
 player_run_img = load_image(os.path.join(ASSETS_DIR, 'player_r.png'), scale=0.5)
 player_stealth_img = load_image(os.path.join(ASSETS_DIR, 'player_s.png'), scale=0.5)
-alien_img = load_image(os.path.join(ASSETS_DIR, 'alien.jpg'), scale=0.04)
+alien_img = load_image(os.path.join(ASSETS_DIR, 'alien.jpg'), scale=0.05)
 
-# Define the map layout (40 columns x 23 rows)
 map_layout = [
-    "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
-    "W                                                          W",
-    "W   WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW   W",
-    "W   W                                              W        W",
-    "W   W   WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW   W",
-    "W   W   W                                        W      W  W",
-    "W   W   W   WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW      W  W",
-    "W   W   W   W                                        W  W",
-    "W   W   W   W   WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW    W  W",
-    "W   W   W   W   W                             W       W  W",
-    "W   W   W   W   W   WWWWWWWWWWWWWWWWWWWWWWWWWWW   W    W  W",
-    "W   W   W   W   W   W                         W   W    W  W",
-    "W   W   W   W   W   W   WWWWWWWWWWWWWWWWWWWWWWW   W    W  W",
-    "W   W   W   W   W   W   W                     W   W    W  W",
-    "W   W   W   W   W   W   W   WWWWWWWWWWWWWWWWWWW   W    W  W",
-    "W   W   W   W   W   W   W   W                 W   W    W  W",
-    "W   W   W   W   W   W   W   W   WWWWWWWWWWWWWWW   W    W  W",
-    "W   W   W   W   W   W   W   W   W               W   W    W  W",
-    "W   W   W   W   W   W   W   W   W   WWWWWWWWWWWWW   W    W",
-    "W   W   W   W   W   W   W   W   W                     W  W",
-    "W                                                          W",
-    "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+    "WWWWWWWWWWWWWWWWWWWW",
+    "W   W       W     W",
+    "W W W WWWWW W W W W",
+    "W W   W   W W W W W",
+    "W WWWWW W WWW W W W",
+    "W       W     W   W",
+    "W WWWWWWWWWWWWWWW W",
+    "W W             W W",
+    "W W WWWWWWWWWWW W W",
+    "W W W         W W W",
+    "W W W WWWWWWW W W W",
+    "W W W       W W   W",
+    "W W WWWWWWW W WWW W",
+    "W W         W     W",
+    "W WWWWWWWWWWWWWWWWW",
+    "W                 W",
+    "WWWWWWWWWWWWWWWWWWW"
 ]
-
 # Define Wall class
 class Wall(pygame.sprite.Sprite):
     def __init__(self, x, y, width, height):
@@ -170,7 +164,7 @@ class Alien(pygame.sprite.Sprite):
 # Initialize player and alien
 player_start_x, player_start_y = WIDTH // 2, HEIGHT // 2
 player = Player(player_img, player_start_x, player_start_y)
-alien = Alien(alien_img, 100, 100)
+alien = Alien(alien_img, WIDTH // 2, HEIGHT // 2)
 
 # Create walls
 walls = pygame.sprite.Group()
