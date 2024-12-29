@@ -2,23 +2,23 @@ import pygame
 import math
 import os
 import sys
+from collections import deque
 
 # Initialize Pygame
 pygame.init()
 
 # Constants
-WIDTH, HEIGHT = 1600, 1600  # Updated window size
+WIDTH, HEIGHT = 1600, 1600
 FPS = 60
 TILE_SIZE = 80
-  # Size of each tile in pixels
 
 # Colors
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 
 # Player speeds (pixels per second)
-PLAYER_SPEEDS = {'walk': 150, 'run': 300, 'stealth': 75}
-ALIEN_SPEED = 200  # pixels per second
+PLAYER_SPEEDS = {'walk': 150, 'run': 250, 'stealth': 75}
+ALIEN_SPEED = 300  # pixels per second
 
 # Setup the display
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -70,12 +70,13 @@ map_layout = [
     "W                 W",
     "WWWWWWWWWWWWWWWWWWW"
 ]
+
 # Define Wall class
 class Wall(pygame.sprite.Sprite):
     def __init__(self, x, y, width, height):
         super().__init__()
         self.image = pygame.Surface((width, height))
-        self.image.fill(BLACK)  # Walls are black; you can change the color or use an image
+        self.image.fill(BLACK)
         self.rect = self.image.get_rect(topleft=(x, y))
 
 # Define Player class
@@ -87,7 +88,7 @@ class Player(pygame.sprite.Sprite):
             'run': player_run_img,
             'stealth': player_stealth_img
         }
-        self.state = 'walk'  # Default state
+        self.state = 'walk'
         self.image = self.images[self.state]
         self.rect = self.image.get_rect(center=(x, y))
         self.speed = PLAYER_SPEEDS[self.state]
@@ -99,25 +100,20 @@ class Player(pygame.sprite.Sprite):
             self.speed = PLAYER_SPEEDS[self.state]
 
     def move(self, dx, dy, walls):
-        # Move horizontally
         self.rect.x += dx
         collided_walls = pygame.sprite.spritecollide(self, walls, False)
         if collided_walls:
-            if dx > 0:  # Moving right; align to the left side of the wall
+            if dx > 0:
                 self.rect.right = collided_walls[0].rect.left
-            elif dx < 0:  # Moving left; align to the right side of the wall
+            elif dx < 0:
                 self.rect.left = collided_walls[0].rect.right
-
-        # Move vertically
         self.rect.y += dy
         collided_walls = pygame.sprite.spritecollide(self, walls, False)
         if collided_walls:
-            if dy > 0:  # Moving down; align to the top side of the wall
+            if dy > 0:
                 self.rect.bottom = collided_walls[0].rect.top
-            elif dy < 0:  # Moving up; align to the bottom side of the wall
+            elif dy < 0:
                 self.rect.top = collided_walls[0].rect.bottom
-
-        # Optional: Keep the player within the screen bounds
         self.rect.x = max(0, min(self.rect.x, WIDTH - self.rect.width))
         self.rect.y = max(0, min(self.rect.y, HEIGHT - self.rect.height))
 
@@ -127,8 +123,8 @@ class Alien(pygame.sprite.Sprite):
         super().__init__()
         self.image = image
         self.rect = self.image.get_rect(center=(x, y))
-        self.speed = ALIEN_SPEED  # Constant speed
-        self.target = (x, y)      # Initial target is its starting position
+        self.speed = ALIEN_SPEED
+        self.target = (x, y)
 
     def set_target(self, x, y):
         self.target = (x, y)
@@ -139,27 +135,27 @@ class Alien(pygame.sprite.Sprite):
         distance = math.hypot(dx, dy)
 
         if distance != 0:
-            # Calculate normalized direction vector
             move_x = (dx / distance) * self.speed * dt
             move_y = (dy / distance) * self.speed * dt
 
-            # Move horizontally
+            # 水平移動
             self.rect.x += move_x
             collided_walls = pygame.sprite.spritecollide(self, walls, False)
             if collided_walls:
-                if move_x > 0:  # Moving right
+                if move_x > 0:  # 向右移動，撞到牆壁的左邊
                     self.rect.right = collided_walls[0].rect.left
-                elif move_x < 0:  # Moving left
+                elif move_x < 0:  # 向左移動，撞到牆壁的右邊
                     self.rect.left = collided_walls[0].rect.right
 
-            # Move vertically
+            # 垂直移動
             self.rect.y += move_y
             collided_walls = pygame.sprite.spritecollide(self, walls, False)
             if collided_walls:
-                if move_y > 0:  # Moving down
+                if move_y > 0:  # 向下移動，撞到牆壁的上邊
                     self.rect.bottom = collided_walls[0].rect.top
-                elif move_y < 0:  # Moving up
+                elif move_y < 0:  # 向上移動，撞到牆壁的下邊
                     self.rect.top = collided_walls[0].rect.bottom
+
 
 # Initialize player and alien
 player_start_x, player_start_y = WIDTH // 2, HEIGHT // 2
@@ -168,7 +164,6 @@ alien = Alien(alien_img, WIDTH // 2, HEIGHT // 2)
 
 # Create walls
 walls = pygame.sprite.Group()
-
 for row_idx, row in enumerate(map_layout):
     for col_idx, tile in enumerate(row):
         if tile == 'W':
@@ -177,94 +172,44 @@ for row_idx, row in enumerate(map_layout):
             wall = Wall(wall_x, wall_y, TILE_SIZE, TILE_SIZE)
             walls.add(wall)
 
-# Fonts
-pygame.font.init()
-font = pygame.font.SysFont(None, 24)
-
-# Key states
-keys_pressed = {
-    'W': False,
-    'A': False,
-    'S': False,
-    'D': False,
-    'Run': False,
-    'Stealth': False
-}
-
-# Function to draw tiled background
-def draw_background():
-    bg_rect = background_img.get_rect()
-    for x in range(0, WIDTH, bg_rect.width):
-        for y in range(0, HEIGHT, bg_rect.height):
-            screen.blit(background_img, (x, y))
-
 # Main loop
 running = True
+last_update_time = pygame.time.get_ticks()  # 記錄目標最後更新的時間
 while running:
     dt = clock.tick(FPS) / 1000  # Delta time in seconds
+    current_time = pygame.time.get_ticks()
 
-    # Event handling
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
 
-        elif event.type == pygame.KEYDOWN or event.type == pygame.KEYUP:
-            pressed = event.type == pygame.KEYDOWN
-            if event.key == pygame.K_w:
-                keys_pressed['W'] = pressed
-            elif event.key == pygame.K_a:
-                keys_pressed['A'] = pressed
-            elif event.key == pygame.K_s:
-                keys_pressed['S'] = pressed
-            elif event.key == pygame.K_d:
-                keys_pressed['D'] = pressed
-            elif event.key == pygame.K_SPACE:
-                keys_pressed['Run'] = pressed
-            elif event.key == pygame.K_c and pressed:
-                keys_pressed['Stealth'] = not keys_pressed['Stealth']
-
-    # Update player state based on keys pressed
-    if keys_pressed['Stealth']:
-        player.update_state('stealth')
-    elif keys_pressed['Run']:
-        player.update_state('run')
-    else:
-        player.update_state('walk')
-
-    # Calculate movement deltas
+    # Update player movement
     dx = dy = 0
-    if keys_pressed['A']:
-        dx -= player.speed * dt
-    if keys_pressed['D']:
-        dx += player.speed * dt
-    if keys_pressed['W']:
+    keys = pygame.key.get_pressed()
+    if keys[pygame.K_w]:
         dy -= player.speed * dt
-    if keys_pressed['S']:
+    if keys[pygame.K_s]:
         dy += player.speed * dt
-
-    # Move the player with collision handling
+    if keys[pygame.K_a]:
+        dx -= player.speed * dt
+    if keys[pygame.K_d]:
+        dx += player.speed * dt
     player.move(dx, dy, walls)
 
-    # Update alien's target position based on player's current position
-    alien.set_target(player.rect.centerx, player.rect.centery)
+    # Update alien target every 3 seconds
+    if current_time - last_update_time >= 3000:
+        alien.set_target(player.rect.centerx, player.rect.centery)
+        last_update_time = current_time
 
-    # Update alien's position towards the target with collision handling
+    # Update alien position
     alien.update_position(dt, walls)
 
     # Rendering
-    draw_background()                      # Draw the background
-    walls.draw(screen)                    # Draw walls
-    screen.blit(player.image, player.rect)  # Draw the player
-    screen.blit(alien.image, alien.rect)    # Draw the alien
+    screen.fill(WHITE)
+    walls.draw(screen)
+    screen.blit(player.image, player.rect)
+    screen.blit(alien.image, alien.rect)
 
-    # Render labels
-    player_text = font.render(f'Player X: {player.rect.centerx:.2f}, Y: {player.rect.centery:.2f}', True, WHITE)
-    alien_text = font.render(f'Alien Target X: {alien.target[0]:.2f}, Y: {alien.target[1]:.2f}', True, WHITE)
-    screen.blit(player_text, (10, HEIGHT - 60))
-    screen.blit(alien_text, (10, HEIGHT - 30))
-
-    # Update the display
     pygame.display.flip()
 
-# Clean up
 pygame.quit()
