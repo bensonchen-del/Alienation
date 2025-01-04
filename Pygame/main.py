@@ -9,7 +9,7 @@ from rendering import create_radial_gradient, update_darkness
 pygame.init()
 
 # Load map and initialize resources
-map_layout = load_map("Pygame/map/map1.txt")
+map_layout = load_map("map/map1.txt")
 walls, walkable_tiles = create_map(map_layout)
 
 # Initialize player and tracker

@@ -69,7 +69,7 @@ def draw_footer():
 # Game pages
 def play_game():
     try:
-        subprocess.run(["python3", "main.py"])  # Use 'python3' or 'python' based on your environment
+        subprocess.run(["python3", "Pygame/main.py"])  # Use 'python3' or 'python' based on your environment
         # Quit the current Pygame window before running the external script
         pygame.quit()
         sys.exit()  # Ensure the current program exits completely
