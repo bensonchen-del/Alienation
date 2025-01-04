@@ -87,7 +87,7 @@ def credits_page():
     screen.fill(DARK_BLUE)
     text = font.render("Credits", True, BLUE)
     screen.blit(text, (WIDTH // 2 - text.get_width() // 2, HEIGHT // 2 - 50))
-    details = small_font.render("Designed by: Your Name", True, WHITE)
+    details = small_font.render("Designed by: Oscar Kuo, Benson Chen", True, WHITE)
     screen.blit(details, (WIDTH // 2 - details.get_width() // 2, HEIGHT // 2 + 50))
 
 # Main loop
