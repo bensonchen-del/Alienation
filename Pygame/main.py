@@ -4,12 +4,12 @@ import math
 from config import *
 from map_resources import load_map, create_map
 from game_objects import Player, Tracker
-from rendering import create_radial_gradient, update_darkness
+from rendering import create_radial_gradient, update_darkness, draw_path
 
 pygame.init()
 
 # Load map and initialize resources
-map_layout = load_map("map/map1.txt")
+map_layout = load_map("Pygame/map/map1.txt")
 walls, walkable_tiles = create_map(map_layout)
 
 # Initialize player and tracker
@@ -41,18 +41,37 @@ while running:
     if keys[pygame.K_a]: dx = -1
     if keys[pygame.K_d]: dx = 1
 
+    # Normalize diagonal movement
+    if dx != 0 and dy != 0:
+        dx *= math.sqrt(0.5)
+        dy *= math.sqrt(0.5)
+
+    # Calculate potential new positions
     new_player_x = player.rect.x + dx * current_speed * dt
     new_player_y = player.rect.y + dy * current_speed * dt
 
-    new_player_rect = player.rect.copy()
-    new_player_rect.x = new_player_x
-    new_player_rect.y = new_player_y
+    # Create separate rects for x and y movements
+    new_player_rect_x = player.rect.copy()
+    new_player_rect_x.x = new_player_x
 
-    # Check collision
-    collision = any(wall.rect.colliderect(new_player_rect) for wall in walls)
-    if not collision:
+    new_player_rect_y = player.rect.copy()
+    new_player_rect_y.y = new_player_y
+
+    # Check collision for X movement
+    collision_x = any(wall.rect.colliderect(new_player_rect_x) for wall in walls)
+    if not collision_x:
         player.rect.x = new_player_x
+    else:
+        # Optional: Handle sliding or other responses here
+        pass  # Currently, do nothing if collision in X
+
+    # Check collision for Y movement
+    collision_y = any(wall.rect.colliderect(new_player_rect_y) for wall in walls)
+    if not collision_y:
         player.rect.y = new_player_y
+    else:
+        # Optional: Handle sliding or other responses here
+        pass  # Currently, do nothing if collision in Y
 
     # Calculate distance to player
     distance = math.hypot(player.rect.centerx - tracker.rect.centerx, player.rect.centery - tracker.rect.centery)
@@ -67,13 +86,14 @@ while running:
         tracker.speed = tracker.follow_speed
         tracker.initialize_tracker_target('follow', map_layout, walkable_tiles, player)
 
-    tracker.update(dt, player.rect.center, map_layout, walkable_tiles, player)
+    tracker.update(dt, player, map_layout, walkable_tiles)
 
     # Rendering
     screen.fill(WHITE)
     walls.draw(screen)
     screen.blit(player.image, player.rect)
     screen.blit(tracker.image, tracker.rect)
+    draw_path(tracker.path)
     update_darkness(player.rect.center, visibility_gradient, darkness)
     screen.blit(darkness, (0, 0))
     pygame.display.flip()

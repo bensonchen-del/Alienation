@@ -7,13 +7,14 @@ FPS = 60  # 遊戲刷新率
 
 # Gameplay constants
 DISTANCE_THRESHOLD = 300  # 追蹤者進入追蹤狀態的距離閾值
-WANDER_INTERVAL = 50  # 游蕩模式目標更換的間隔時間（秒）
-WAITING_DURATION = 5  # 等待狀態持續時間（秒）
-WANDER_SPEED = 150  # 游蕩模式速度
+WANDER_INTERVAL = 10.0  # 游蕩模式目標更換的間隔時間（秒）
+WAITING_DURATION = 5.0  # 等待狀態持續時間（秒）
+WANDER_SPEED = 100  # 游蕩模式速度
 FOLLOW_SPEED = 300  # 追蹤模式速度
 RUN_SPEED = 300  # 玩家奔跑速度
 SNEAK_SPEED = 75  # 玩家潛行速度
 VISIBILITY_RADIUS = 200  # 玩家可見區域半徑
+MIN_TARGET_DISTANCE = 100  # 追蹤者與目標之間的最小距離
 
 # Colors
 WHITE = (240, 240, 240)  # 白色背景
