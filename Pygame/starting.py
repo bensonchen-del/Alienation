@@ -75,8 +75,9 @@ def play_game():
         sys.exit()  # Ensure the current program exits completely
     except FileNotFoundError:
         # Handle case where the script is not found
-        print("Error: AI.py not found!")
-        screen.blit(text, (WIDTH // 2 - text.get_width() // 2, HEIGHT // 2 - 50))
+        print("Error: main.py not found!")
+        error_message = small_font.render("Error: main.py not found!", True, BLUE)
+        screen.blit(error_message, (WIDTH // 2 - error_message.get_width() // 2, HEIGHT // 2 - 50))
 
 def save_game():
     screen.fill(DARK_BLUE)
