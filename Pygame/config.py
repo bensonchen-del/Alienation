@@ -23,3 +23,7 @@ BLUE = (0, 0, 255)  # 游蕩狀態
 GREEN = (0, 255, 0)  # 追蹤狀態
 YELLOW = (255, 255, 0)  # 等待狀態
 RED = (255, 0, 0)  # 玩家
+
+# Radar settings
+RADAR_CENTER = (WIDTH - 250, 250)  # Position on screen
+RADAR_RADIUS = 200

@@ -24,10 +24,6 @@ clock = pygame.time.Clock()
 visibility_gradient = create_radial_gradient(VISIBILITY_RADIUS)
 darkness = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
 
-# Radar settings
-RADAR_CENTER = (WIDTH - 250, 250)  # Position on screen
-RADAR_RADIUS = 200
-
 running = True
 while running:
     dt = clock.tick(FPS) / 1000
