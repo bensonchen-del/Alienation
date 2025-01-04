@@ -4,7 +4,7 @@ import math
 from config import *
 from map_resources import load_map, create_map
 from game_objects import Player, Tracker
-from rendering import create_radial_gradient, update_darkness, draw_path
+from rendering import create_radial_gradient, update_darkness, draw_path, draw_radar
 
 pygame.init()
 
@@ -23,6 +23,10 @@ pygame.display.set_caption("Dynamic Tracker Behavior with Realistic Fog")
 clock = pygame.time.Clock()
 visibility_gradient = create_radial_gradient(VISIBILITY_RADIUS)
 darkness = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
+
+# Radar settings
+RADAR_CENTER = (WIDTH - 150, 150)  # Position on screen
+RADAR_RADIUS = 100
 
 running = True
 while running:
@@ -96,6 +100,10 @@ while running:
     draw_path(tracker.path)
     update_darkness(player.rect.center, visibility_gradient, darkness)
     screen.blit(darkness, (0, 0))
+
+    # Draw radar (after main elements)
+    draw_radar(screen, player.rect.center, tracker.rect.center, RADAR_CENTER, RADAR_RADIUS)
+
     pygame.display.flip()
 
 pygame.quit()
