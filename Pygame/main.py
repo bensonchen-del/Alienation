@@ -37,8 +37,19 @@ while running:
             running = False
 
     keys = pygame.key.get_pressed()
-    current_speed = RUN_SPEED if keys[pygame.K_SPACE] else SNEAK_SPEED if keys[pygame.K_c] else player.speed
 
+    # Determine player's movement speed and adjust DISTANCE_THRESHOLD
+    if keys[pygame.K_LSHIFT]:  # Sneak mode
+        current_speed = SNEAK_SPEED
+        current_distance_threshold = DISTANCE_THRESHOLD * 0.5  # Reduced threshold for sneaking
+    elif keys[pygame.K_SPACE]:  # Sprint mode
+        current_speed = RUN_SPEED
+        current_distance_threshold = DISTANCE_THRESHOLD * 1.5  # Increased threshold for sprinting
+    else:  # Normal mode
+        current_speed = player.speed
+        current_distance_threshold = DISTANCE_THRESHOLD  # Default threshold
+
+    # Adjust distance calculations based on new threshold
     dx, dy = 0, 0
     if keys[pygame.K_w]: dy = -1
     if keys[pygame.K_s]: dy = 1
@@ -50,46 +61,34 @@ while running:
         dx *= math.sqrt(0.5)
         dy *= math.sqrt(0.5)
 
-    # Calculate potential new positions
+    # Update player's position
     new_player_x = player.rect.x + dx * current_speed * dt
     new_player_y = player.rect.y + dy * current_speed * dt
 
-    # Create separate rects for x and y movements
     new_player_rect_x = player.rect.copy()
     new_player_rect_x.x = new_player_x
 
     new_player_rect_y = player.rect.copy()
     new_player_rect_y.y = new_player_y
 
-    # Check collision for X movement
     collision_x = any(wall.rect.colliderect(new_player_rect_x) for wall in walls)
+    collision_y = any(wall.rect.colliderect(new_player_rect_y) for wall in walls)
+
     if not collision_x:
         player.rect.x = new_player_x
-    else:
-        # Optional: Handle sliding or other responses here
-        pass  # Currently, do nothing if collision in X
-
-    # Check collision for Y movement
-    collision_y = any(wall.rect.colliderect(new_player_rect_y) for wall in walls)
     if not collision_y:
         player.rect.y = new_player_y
-    else:
-        # Optional: Handle sliding or other responses here
-        pass  # Currently, do nothing if collision in Y
 
-    # Calculate distance to player
+    # Tracker logic based on adjusted DISTANCE_THRESHOLD
     distance = math.hypot(player.rect.centerx - tracker.rect.centerx, player.rect.centery - tracker.rect.centery)
-
-    # Update tracker state
-    if distance > DISTANCE_THRESHOLD and tracker.state != 'wander':
+    if distance > current_distance_threshold and tracker.state != 'wander':
         tracker.state = 'wander'
         tracker.speed = tracker.wander_speed
         tracker.initialize_tracker_target('wander', map_layout, walkable_tiles, player)
-    elif distance <= DISTANCE_THRESHOLD and tracker.state != 'follow':
+    elif distance <= current_distance_threshold and tracker.state != 'follow':
         tracker.state = 'follow'
         tracker.speed = tracker.follow_speed
         tracker.initialize_tracker_target('follow', map_layout, walkable_tiles, player)
-
     tracker.update(dt, player, map_layout, walkable_tiles)
 
     # Rendering
