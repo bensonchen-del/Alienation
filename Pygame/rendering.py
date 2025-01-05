@@ -5,8 +5,9 @@ import pygame
 from game_objects import get_tile_position
 from config import *
 
-
-def create_radial_gradient(radius, fade_color_alpha=180):
+def create_radial_gradient(base_radius, time_factor, fade_color_alpha=180):
+    pulsation = int(10 * math.sin(time_factor))  # Pulsates between -10 and +10
+    radius = base_radius + pulsation
     size = radius * 2
     gradient_surface = pygame.Surface((size, size), pygame.SRCALPHA)
     for i in range(radius, 0, -1):
@@ -21,9 +22,17 @@ def draw_path(path_list):
             pos = get_tile_position(tile[0], tile[1])
             pygame.draw.circle(screen, (0, 255, 0), pos, 5)  # Small green circles for path tiles
 
-def update_darkness(player_pos, visibility_gradient, darkness):
-    darkness.fill((0, 0, 0, 0))
-    gradient_pos = (player_pos[0] - VISIBILITY_RADIUS, player_pos[1] - VISIBILITY_RADIUS)
+def update_darkness(player_pos, visibility_gradient, darkness, time_factor):
+    # Clear the darkness surface
+    darkness.fill((0, 0, 0, 255))  # Fully opaque black background
+
+    # Create a swirling offset for the fog
+    offset_x = int(10 * math.sin(time_factor / 2))  # Sway horizontally
+    offset_y = int(10 * math.cos(time_factor / 2))  # Sway vertically
+    gradient_pos = (player_pos[0] - VISIBILITY_RADIUS + offset_x, 
+                    player_pos[1] - VISIBILITY_RADIUS + offset_y)
+
+    # Position the gradient around the player
     darkness.blit(visibility_gradient, gradient_pos, special_flags=pygame.BLEND_RGBA_SUB)
 
 def draw_radar(screen, player_pos, tracker_pos, radar_center, radar_radius):
