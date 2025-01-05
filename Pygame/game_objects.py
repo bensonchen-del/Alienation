@@ -167,8 +167,6 @@ class Tracker(pygame.sprite.Sprite):
                 self.update_color(BLUE)
                 self.waiting_timer = 0
                 self.initialize_tracker_target('wander', map_layout, walkable_tiles)
-<<<<<<< HEAD
-=======
 
         # Teleport only if not in 'follow' state
         if self.state != 'follow':
@@ -176,4 +174,3 @@ class Tracker(pygame.sprite.Sprite):
             if self.teleport_timer >= 30.0:  # 30 seconds
                 self.teleport_to_random_tile(walkable_tiles)
                 self.teleport_timer = 0
->>>>>>> deb4dd959f5a4fbb0fd12b8350c1a261c2d12ec7
