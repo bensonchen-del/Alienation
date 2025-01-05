@@ -41,6 +41,8 @@ class Tracker(pygame.sprite.Sprite):
         self.waiting_timer = 0
         self.previous_target_tile = None  # To prevent backtracking
         self.speed = self.wander_speed
+        self.teleport_timer = 0
+
 
     def initialize_tracker_target(self, state, map_layout, walkable_tiles, player=None):
         if state == 'wander':
@@ -100,6 +102,15 @@ class Tracker(pygame.sprite.Sprite):
                 self.current_target = None
                 print("Follow: Tracker is already on the player's tile.")
 
+    # Add this method in the Tracker class
+    def teleport_to_random_tile(self, walkable_tiles):
+        random_tile = random.choice(walkable_tiles)
+        self.rect.centerx = random_tile[2]
+        self.rect.centery = random_tile[3]
+        self.current_target = None
+        self.path = []
+        print(f"Tracker teleported to {self.rect.center}")
+
     def move_along_path(self, dt):
         if self.current_target is None:
             return False
@@ -156,3 +167,13 @@ class Tracker(pygame.sprite.Sprite):
                 self.update_color(BLUE)
                 self.waiting_timer = 0
                 self.initialize_tracker_target('wander', map_layout, walkable_tiles)
+<<<<<<< HEAD
+=======
+
+        # Teleport only if not in 'follow' state
+        if self.state != 'follow':
+            self.teleport_timer += dt
+            if self.teleport_timer >= 30.0:  # 30 seconds
+                self.teleport_to_random_tile(walkable_tiles)
+                self.teleport_timer = 0
+>>>>>>> deb4dd959f5a4fbb0fd12b8350c1a261c2d12ec7

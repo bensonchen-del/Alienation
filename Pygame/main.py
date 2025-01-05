@@ -23,8 +23,10 @@ tracker = Tracker(tracker_tile[2], tracker_tile[3], BLUE, WANDER_SPEED, FOLLOW_S
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Dynamic Tracker Behavior with Realistic Fog")
 clock = pygame.time.Clock()
-visibility_gradient = create_radial_gradient(VISIBILITY_RADIUS)
+visibility_gradient = create_radial_gradient(VISIBILITY_RADIUS, 180)
 darkness = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
+
+time_factor = 0  # Time factor for dynamic effects
 
 running = True
 while running:
@@ -95,7 +97,14 @@ while running:
     screen.blit(player.image, player.rect)
     screen.blit(tracker.image, tracker.rect)
     draw_path(tracker.path)
-    update_darkness(player.rect.center, visibility_gradient, darkness)
+    # In your game loop
+    time_factor += dt  # Increment time factor
+
+    # Generate the dynamic visibility gradient
+    visibility_gradient = create_radial_gradient(VISIBILITY_RADIUS, time_factor)
+
+    # Update the fog effect
+    update_darkness(player.rect.center, visibility_gradient, darkness, time_factor)
     screen.blit(darkness, (0, 0))
 
     # Draw radar (after main elements)
