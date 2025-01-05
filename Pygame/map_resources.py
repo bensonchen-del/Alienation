@@ -1,5 +1,6 @@
 # map_resources.py
 import pygame
+import os
 from config import TILE_SIZE, BLACK
 
 class Wall(pygame.sprite.Sprite):
@@ -10,8 +11,9 @@ class Wall(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(topleft=(x, y))
 
 def load_map(file_path):
-    """Load the map from a text file."""
-    with open(file_path, 'r') as f:
+    base_path = os.path.dirname(os.path.abspath(__file__))
+    absolute_path = os.path.join(base_path, file_path)
+    with open(absolute_path, 'r') as f:
         return [line.strip() for line in f.readlines()]
 
 def create_map(map_layout):

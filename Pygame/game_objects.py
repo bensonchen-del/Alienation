@@ -5,7 +5,7 @@ from config import *
 from game_logic import bfs, move_towards_target
 from map_resources import load_map, create_map
 
-map_layout = load_map("Pygame/map/map1.txt")
+map_layout = load_map("map/map1.txt")
 
 # Calculate the center position of a tile in pixels
 def get_tile_position(tile_row, tile_col):
@@ -156,4 +156,3 @@ class Tracker(pygame.sprite.Sprite):
                 self.update_color(BLUE)
                 self.waiting_timer = 0
                 self.initialize_tracker_target('wander', map_layout, walkable_tiles)
-

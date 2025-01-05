@@ -1,6 +1,8 @@
 import pygame
 import random
 import math
+import os
+os.chdir(os.path.dirname(os.path.abspath(__file__)))
 from config import *
 from map_resources import load_map, create_map
 from game_objects import Player, Tracker
@@ -9,7 +11,7 @@ from rendering import create_radial_gradient, update_darkness, draw_path, draw_r
 pygame.init()
 
 # Load map and initialize resources
-map_layout = load_map("Pygame/map/map1.txt")
+map_layout = load_map("map/map1.txt")
 walls, walkable_tiles = create_map(map_layout)
 
 # Initialize player and tracker
@@ -35,12 +37,12 @@ while running:
     keys = pygame.key.get_pressed()
 
     # Determine player's movement speed and adjust DISTANCE_THRESHOLD
-    if keys[pygame.K_LSHIFT]:  # Sneak mode
+    if keys[pygame.K_c]:  # Sneak mode
         current_speed = SNEAK_SPEED
         current_distance_threshold = DISTANCE_THRESHOLD * 0.5  # Reduced threshold for sneaking
     elif keys[pygame.K_SPACE]:  # Sprint mode
         current_speed = RUN_SPEED
-        current_distance_threshold = DISTANCE_THRESHOLD * 1.5  # Increased threshold for sprinting
+        current_distance_threshold = DISTANCE_THRESHOLD * 2.5  # Increased threshold for sprinting
     else:  # Normal mode
         current_speed = player.speed
         current_distance_threshold = DISTANCE_THRESHOLD  # Default threshold
