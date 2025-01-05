@@ -27,31 +27,33 @@ def update_darkness(player_pos, visibility_gradient, darkness):
     darkness.blit(visibility_gradient, gradient_pos, special_flags=pygame.BLEND_RGBA_SUB)
 
 def draw_radar(screen, player_pos, tracker_pos, radar_center, radar_radius):
-    # Draw radar background
-    pygame.draw.circle(screen, (50, 50, 50), radar_center, radar_radius)
+    # Create a transparent surface for the radar
+    radar_surface = pygame.Surface((radar_radius * 2, radar_radius * 2), pygame.SRCALPHA)
+    radar_surface.fill((0, 0, 0, 0))  # Fully transparent background
+
+    # Draw radar background on the transparent surface
+    pygame.draw.circle(radar_surface, (50, 50, 50, 150), (radar_radius, radar_radius), radar_radius)  # Semi-transparent gray
     for i in range(1, 5):  # Concentric circles
-        pygame.draw.circle(screen, (100, 100, 100), radar_center, radar_radius * i // 5, 1)
+        pygame.draw.circle(radar_surface, (100, 100, 100, 100), (radar_radius, radar_radius), radar_radius * i // 5, 1)
     
-    # Player position
-    pygame.draw.circle(screen, (0, 255, 0), radar_center, 5)
-    
-    # Calculate tracker position
+    # Player position (center of radar)
+    pygame.draw.circle(radar_surface, (0, 255, 0, 255), (radar_radius, radar_radius), 5)  # Opaque green dot for player
+
+    # Calculate tracker position relative to player
     dx = tracker_pos[0] - player_pos[0]
     dy = tracker_pos[1] - player_pos[1]
     distance = math.hypot(dx, dy)
-    
-    # Normalize direction and scale to radar size
+
     if distance > 0:
         direction_x = dx / distance
         direction_y = dy / distance
         scaled_distance = min(distance / 500 * radar_radius, radar_radius)  # Scale to radar radius
-        
-        tracker_radar_x = radar_center[0] + direction_x * scaled_distance
-        tracker_radar_y = radar_center[1] + direction_y * scaled_distance
-        
-        # Draw tracker
-        pygame.draw.circle(screen, (255, 0, 0), (int(tracker_radar_x), int(tracker_radar_y)), 5)
-        
-        # Add line for direction
-        pygame.draw.line(screen, (255, 0, 0), radar_center, (int(tracker_radar_x), int(tracker_radar_y)), 1)
+        tracker_x = radar_radius + direction_x * scaled_distance
+        tracker_y = radar_radius + direction_y * scaled_distance
 
+        # Draw tracker position and direction line
+        pygame.draw.circle(radar_surface, (255, 0, 0, 255), (int(tracker_x), int(tracker_y)), 5)  # Opaque red dot for tracker
+        pygame.draw.line(radar_surface, (255, 0, 0, 150), (radar_radius, radar_radius), (int(tracker_x), int(tracker_y)), 1)
+
+    # Blit the radar surface onto the main screen
+    screen.blit(radar_surface, (radar_center[0] - radar_radius, radar_center[1] - radar_radius))
