@@ -1,6 +1,4 @@
-# rendering.py
 import math
-from turtle import Screen
 import pygame
 from game_objects import get_tile_position
 from config import *
@@ -16,6 +14,7 @@ def create_radial_gradient(base_radius, time_factor, fade_color_alpha=180):
     return gradient_surface
 
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
+
 def draw_path(path_list):
     if path_list:
         for tile in path_list:

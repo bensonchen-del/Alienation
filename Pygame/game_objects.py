@@ -148,7 +148,7 @@ class Tracker(pygame.sprite.Sprite):
             if self.wander_timer >= WANDER_INTERVAL or self.current_target is None:
                 print(f"Wander: {WANDER_INTERVAL} seconds elapsed or no current target. Selecting new target.")
                 self.initialize_tracker_target('wander', map_layout, walkable_tiles)
-            
+
             if self.current_target:
                 self.move_along_path(dt)
 

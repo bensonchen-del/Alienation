@@ -26,6 +26,14 @@ clock = pygame.time.Clock()
 visibility_gradient = create_radial_gradient(VISIBILITY_RADIUS, 180)
 darkness = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
 
+# Load jumpscare image
+jumpscare_image = pygame.image.load("assets/jumpscare1.png")
+
+# Load background sound
+pygame.mixer.init()
+pygame.mixer.music.load("Deep Fan Noise (1 Minute).mp3")
+pygame.mixer.music.play(-1)  # Loop background sound infinitely
+
 time_factor = 0  # Time factor for dynamic effects
 
 running = True
@@ -90,6 +98,15 @@ while running:
         tracker.speed = tracker.follow_speed
         tracker.initialize_tracker_target('follow', map_layout, walkable_tiles, player)
     tracker.update(dt, player, map_layout, walkable_tiles)
+
+    # Check for collision between player and tracker
+    if pygame.sprite.collide_rect(player, tracker):  # Check if player and tracker collide
+        screen.fill((0, 0, 0))  # Clear screen
+        screen.blit(jumpscare_image, (WIDTH // 2 - jumpscare_image.get_width() // 2, HEIGHT // 2 - jumpscare_image.get_height() // 2))
+        pygame.display.flip()
+        pygame.time.wait(500)  # Show jumpscare for 0.5 seconds
+        pygame.quit()
+        sys.exit()
 
     # Rendering
     screen.fill(WHITE)
