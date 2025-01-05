@@ -7,14 +7,13 @@ import subprocess  # Import subprocess for running external scripts
 pygame.init()
 pygame.mixer.init()
 
-# Load and play background music
-#mp3_file = "Alien Soundtrack Track 6 The Passage Jerry Goldsmith.mp3"
-#try:
- #   pygame.mixer.music.load(mp3_file)
-  #  pygame.mixer.music.play(-1)  # -1 means loop indefinitely
-#except pygame.error as e:
- #   print(f"Unable to load MP3 file: {e}")
-  #  sys.exit()
+mp3_file = "Alien Soundtrack Track 6 The Passage Jerry Goldsmith.mp3"
+try:
+  pygame.mixer.music.load(mp3_file)
+  pygame.mixer.music.play(-1)  # -1 means loop indefinitely
+except pygame.error as e:
+  print(f"Unable to load MP3 file: {e}")
+  sys.exit()
 
 # Screen settings
 WIDTH, HEIGHT = 1200, 800
