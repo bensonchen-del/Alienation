@@ -18,7 +18,7 @@ except pygame.error as e:
 # Screen settings
 WIDTH, HEIGHT = 1200, 800
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption("Retro Futuristic Display")
+pygame.display.set_caption("Alienation")
 
 # Colors
 BLACK = (0, 0, 0)

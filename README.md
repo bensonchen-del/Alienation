@@ -87,6 +87,20 @@
 
 ## 安裝指南
 
+Clone the repository:
+
+git clone git@github.com:bensonchen-del/Alienation.git
+Navigate to the project directory:
+
+cd Alienation/Pygame
+Install the required dependencies:
+
+pip install pygame
+Run the game (Linux):
+
+python3 starting.py
+
+
 ### 前置需求
 
 - [Python](https://www.python.org/)（版本 3.7 或更高）
