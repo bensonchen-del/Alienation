@@ -13,23 +13,47 @@ def get_tile_position(tile_row, tile_col):
     center_y = tile_row * TILE_SIZE + TILE_SIZE // 2
     return (center_x, center_y)
 
-# Define the Player class
-class Player(pygame.sprite.Sprite):
-    def __init__(self, x, y, color, speed):
+class Creature(pygame.sprite.Sprite):
+    def __init__(self, x, y, color, size=TILE_SIZE // 2, speed=0):
         super().__init__()
-        self.image = pygame.Surface((TILE_SIZE // 2, TILE_SIZE // 2))
-        self.image.fill(color)
-        self.rect = self.image.get_rect(center=(x, y))
-        self.speed = speed
-
-# Define the Tracker class
-class Tracker(pygame.sprite.Sprite):
-    def __init__(self, x, y, color, wander_speed, follow_speed, visibility_radius):
-        super().__init__()
-        self.image = pygame.Surface((TILE_SIZE // 2, TILE_SIZE // 2))
+        self.image = pygame.Surface((size, size))
         self.color = color
         self.image.fill(self.color)
         self.rect = self.image.get_rect(center=(x, y))
+        self.speed = speed
+
+    def update_position(self, dx, dy):
+        self.rect.x += dx
+        self.rect.y += dy
+
+    def update_color(self, new_color):
+        if self.color != new_color:
+            self.color = new_color
+            self.image.fill(self.color)
+
+class Player(Creature):
+    def __init__(self, x, y, color, speed):
+        super().__init__(x, y, color, speed=speed)
+        # Additional Player-specific initialization can go here
+        # For example, inventory, health, etc.
+
+    def handle_input(self, keys_pressed, dt):
+        dx, dy = 0, 0
+        if keys_pressed[pygame.K_LEFT]:
+            dx -= self.speed * dt
+        if keys_pressed[pygame.K_RIGHT]:
+            dx += self.speed * dt
+        if keys_pressed[pygame.K_UP]:
+            dy -= self.speed * dt
+        if keys_pressed[pygame.K_DOWN]:
+            dy += self.speed * dt
+        self.update_position(dx, dy)
+
+
+# Define the Tracker class
+class Tracker(Creature):
+    def __init__(self, x, y, color, wander_speed, follow_speed, visibility_radius):
+        super().__init__(x, y, color, speed=wander_speed)
         self.wander_speed = wander_speed
         self.follow_speed = follow_speed
         self.visibility_radius = visibility_radius
@@ -40,9 +64,7 @@ class Tracker(pygame.sprite.Sprite):
         self.wander_timer = 0
         self.waiting_timer = 0
         self.previous_target_tile = None  # To prevent backtracking
-        self.speed = self.wander_speed
         self.teleport_timer = 0
-
 
     def initialize_tracker_target(self, state, map_layout, walkable_tiles, player=None):
         if state == 'wander':
@@ -102,7 +124,6 @@ class Tracker(pygame.sprite.Sprite):
                 self.current_target = None
                 print("Follow: Tracker is already on the player's tile.")
 
-    # Add this method in the Tracker class
     def teleport_to_random_tile(self, walkable_tiles):
         random_tile = random.choice(walkable_tiles)
         self.rect.centerx = random_tile[2]
@@ -133,11 +154,6 @@ class Tracker(pygame.sprite.Sprite):
                     self.current_target = None
             return True
         return False
-
-    def update_color(self, color):
-        if self.color != color:
-            self.color = color
-            self.image.fill(self.color)
 
     def update(self, dt, player, map_layout, walkable_tiles):
         # Update based on state
