@@ -37,7 +37,6 @@ def update_darkness(player_pos, visibility_gradient, darkness, time_factor):
 def draw_radar(screen, player_pos, tracker_pos, radar_center, radar_radius, sweep_angle, max_radar_distance=500, trail_length=10):
     # Create a radar surface with per-pixel alpha
     radar_surface = pygame.Surface((radar_radius * 2, radar_radius * 2), pygame.SRCALPHA)
-    # No need to set overall alpha; use per-pixel alpha instead
 
     # Draw radar background first
     pygame.draw.circle(radar_surface, (0, 50, 0, 200), (radar_radius, radar_radius), radar_radius)
@@ -64,9 +63,8 @@ def draw_radar(screen, player_pos, tracker_pos, radar_center, radar_radius, swee
         pygame.draw.circle(radar_surface, (255, 255, 255, 255), (int(tracker_radar_x), int(tracker_radar_y)), 7)
 
     # Draw the sweeping line and its fading trail
-    # Define trail_length (number of trailing lines) and trail_spacing (degrees between them)
-    trail_length = 50  # Adjust as needed for desired trail length
-    trail_spacing = 0.75   # Degrees between trailing lines
+    trail_length = 100  # Adjust as needed for desired trail length
+    trail_spacing = 0.375  # Degrees between trailing lines
 
     for i in range(trail_length):
         # Calculate the angle for each trailing line
@@ -75,12 +73,13 @@ def draw_radar(screen, player_pos, tracker_pos, radar_center, radar_radius, swee
         end_x = radar_radius + radar_radius * math.cos(angle_rad)
         end_y = radar_radius + radar_radius * math.sin(angle_rad)
         
-        # Calculate alpha for fading effect
-        alpha = min(50 + i * 3, 255)  # Decrease alpha for trail
-        sweep_color = (50, 50, 50, alpha)  # Semi-transparent white
+        # Calculate alpha for fading effect (use exponential decay for more natural fading)
+        alpha = int(255 * (0.99 ** i))  # Exponential decay: smaller `0.9` gives faster fade
+        sweep_color = (0, 50, 0, alpha)
         
         # Draw the trailing line
         pygame.draw.line(radar_surface, sweep_color, (radar_radius, radar_radius), (end_x, end_y), 2)
 
     # Blit the radar surface to the main screen
     screen.blit(radar_surface, (radar_center[0] - radar_radius, radar_center[1] - radar_radius))
+
