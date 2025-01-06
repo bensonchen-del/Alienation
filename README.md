@@ -18,7 +18,7 @@
 - [安裝指南](#安裝指南)
 - [前置需求](#前置需求)
 - [Structure](#Structure)
-- [Class diagram](#Class diagram)
+- [Class diagram](#Class_diagram)
 
 ---
 
