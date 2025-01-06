@@ -176,8 +176,8 @@ while running:
     visibility_gradient = create_radial_gradient(VISIBILITY_RADIUS, time_factor)
 
     # Update the fog effect
-    #update_darkness(player.rect.center, visibility_gradient, darkness, time_factor)
-    #screen.blit(darkness, (0, 0))
+    update_darkness(player.rect.center, visibility_gradient, darkness, time_factor)
+    screen.blit(darkness, (0, 0))
 
     # Draw radar (after main elements)
     draw_radar(screen, player.rect.center, tracker.rect.center, RADAR_CENTER, RADAR_RADIUS, sweep_angle)
