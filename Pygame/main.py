@@ -2,6 +2,7 @@ import pygame
 import random
 import math
 import os
+import sys
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 from config import *
 from map_resources import load_map, create_map
@@ -131,7 +132,6 @@ while running:
 
     # Draw radar (after main elements)
     draw_radar(screen, player.rect.center, tracker.rect.center, RADAR_CENTER, RADAR_RADIUS, sweep_angle)
-
     pygame.display.flip()
 
 pygame.quit()
