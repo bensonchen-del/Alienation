@@ -124,3 +124,15 @@
 
 - [Python](https://www.python.org/)（版本 3.7 或更高）
 - [Pygame](https://www.pygame.org/)（版本 2.0 或更高）
+
+---
+
+## Structure
+
+![Structure](images/structure.png)
+
+---
+
+## Class diagram
+
+![Class diagram](images/class_diagram.png)
