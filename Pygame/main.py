@@ -12,7 +12,43 @@ from rendering import create_radial_gradient, update_darkness, draw_path, draw_r
 pygame.init()
 
 # Load map and initialize resources
-map_layout = load_map("map/map1.txt")
+#map_layout = load_map("map/map1.txt")
+# Load all maps for levels
+LEVELS = [f"map/map{i + 1}.txt" for i in range(5)]
+current_level_index = 0
+
+def load_level(level_index):
+    """Load the map and initialize level resources."""
+    global walls, walkable_tiles, player, tracker, goal_tile
+    map_layout = load_map(LEVELS[level_index])
+    walls, walkable_tiles = create_map(map_layout)
+
+    # Initialize player and tracker
+    player_tile, tracker_tile = random.sample(walkable_tiles, 2)
+    player = Player(player_tile[2], player_tile[3], RED, speed=150)
+    tracker = Tracker(tracker_tile[2], tracker_tile[3], BLUE, WANDER_SPEED, FOLLOW_SPEED, VISIBILITY_RADIUS)
+
+    # Locate goal tile
+    for row_idx, row in enumerate(map_layout):
+        for col_idx, tile in enumerate(row):
+            if tile == 'G':
+                goal_tile = (col_idx * TILE_SIZE + TILE_SIZE // 2, row_idx * TILE_SIZE + TILE_SIZE // 2)
+                break
+
+    return map_layout
+
+# Load goal tile image
+goal_image = pygame.image.load("assets/door.png")
+
+def draw_goal_tile():
+    """Draw the goal tile at its position."""
+    if goal_tile:
+        goal_rect = goal_image.get_rect(center=(goal_tile[0], goal_tile[1]))
+        screen.blit(goal_image, goal_rect)
+
+# Initialize first level
+map_layout = load_level(current_level_index)
+
 walls, walkable_tiles = create_map(map_layout)
 
 # Initialize player and tracker
@@ -114,12 +150,25 @@ while running:
         pygame.quit()
         sys.exit()
 
+    # Check for level transition
+    player_tile = (player.rect.centery // TILE_SIZE, player.rect.centerx // TILE_SIZE)
+    for row_idx, row in enumerate(map_layout):
+        for col_idx, tile in enumerate(row):
+            if tile == 'G' and player_tile == (row_idx, col_idx):
+                current_level_index += 1
+                if current_level_index < len(LEVELS):
+                    map_layout = load_level(current_level_index)
+                else:
+                    print("You completed all levels!")
+                    running = False
+
     # Rendering
     screen.fill(WHITE)
     walls.draw(screen)
     screen.blit(player.image, player.rect)
     screen.blit(tracker.image, tracker.rect)
     draw_path(tracker.path)
+
     # In your game loop
     time_factor += dt  # Increment time factor
 
@@ -127,11 +176,15 @@ while running:
     visibility_gradient = create_radial_gradient(VISIBILITY_RADIUS, time_factor)
 
     # Update the fog effect
-    update_darkness(player.rect.center, visibility_gradient, darkness, time_factor)
-    screen.blit(darkness, (0, 0))
+    #update_darkness(player.rect.center, visibility_gradient, darkness, time_factor)
+    #screen.blit(darkness, (0, 0))
 
     # Draw radar (after main elements)
     draw_radar(screen, player.rect.center, tracker.rect.center, RADAR_CENTER, RADAR_RADIUS, sweep_angle)
+
+    # Draw goal tile
+    draw_goal_tile()
+
     pygame.display.flip()
 
 pygame.quit()

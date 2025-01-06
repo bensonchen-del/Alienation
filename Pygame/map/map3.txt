@@ -1,5 +1,5 @@
 WWWWWWWWWWWWWWWWWWWW
-W       GW     W   W
+W        W     W   W
 W WWWWW WWWWW WWW  W
 W W     W   W      W
 W W WWWWW W WWWWW  W
@@ -7,7 +7,7 @@ W W     W W   W    W
 W WWWWW   WWW W WW W
 W           W W    W
 W WWWWWWW W W W WWWW
-W W     W W W W W  W
+W W     W W W W W GW
 W W WWWWW W W W W WW
 W   W     W   W    W
 W WWWWWWWWWW       W
@@ -16,5 +16,5 @@ W W WWWWWWWWW W W  W
 W W W           W  W
 W W WWWWWWWWWWWWW  W
 W                  W
-W WWWWWWWWWWWWWWWWWW
+WGWWWWWWWWWWWWWWWWWW
 WWWWWWWWWWWWWWWWWWWW
