@@ -11,6 +11,10 @@ from rendering import create_radial_gradient, update_darkness, draw_path, draw_r
 
 pygame.init()
 
+def calculate_distance(pos1, pos2):
+    """Calculate Euclidean distance between two positions."""
+    return math.hypot(pos2[0] - pos1[0], pos2[1] - pos1[1])
+
 # Load map and initialize resources
 #map_layout = load_map("map/map1.txt")
 # Load all maps for levels
@@ -23,17 +27,32 @@ def load_level(level_index):
     map_layout = load_map(LEVELS[level_index])
     walls, walkable_tiles = create_map(map_layout)
 
-    # Initialize player and tracker
-    player_tile, tracker_tile = random.sample(walkable_tiles, 2)
-    player = Player(player_tile[2], player_tile[3], RED, speed=150)
-    tracker = Tracker(tracker_tile[2], tracker_tile[3], BLUE, WANDER_SPEED, FOLLOW_SPEED, VISIBILITY_RADIUS)
-
-    # Locate goal tile
+    # Locate goal tile (marked as 'G' in the map)
+    goal_tile = None
     for row_idx, row in enumerate(map_layout):
         for col_idx, tile in enumerate(row):
             if tile == 'G':
                 goal_tile = (col_idx * TILE_SIZE + TILE_SIZE // 2, row_idx * TILE_SIZE + TILE_SIZE // 2)
                 break
+
+    if not goal_tile:
+        raise ValueError("No goal ('G') found in the map.")
+
+    # Spawn player and tracker with minimum distance constraint
+    while True:
+        player_tile, tracker_tile = random.sample(walkable_tiles, 2)
+        player_pos = (player_tile[2], player_tile[3])
+        tracker_pos = (tracker_tile[2], tracker_tile[3])
+
+        # Ensure player and tracker are far enough apart
+        if calculate_distance(player_pos, tracker_pos) > TILE_SIZE * 8:
+            # Ensure player and goal are far enough apart
+            if calculate_distance(player_pos, goal_tile) > TILE_SIZE * 12:
+                break
+
+    # Initialize player and tracker
+    player = Player(player_tile[2], player_tile[3], RED, speed=150)
+    tracker = Tracker(tracker_tile[2], tracker_tile[3], BLUE, WANDER_SPEED, FOLLOW_SPEED, VISIBILITY_RADIUS)
 
     return map_layout
 
@@ -43,13 +62,44 @@ goal_image = pygame.image.load("assets/door.png")
 def draw_goal_tile():
     """Draw the goal tile at its position."""
     if goal_tile:
-        goal_rect = goal_image.get_rect(center=(goal_tile[0], goal_tile[1]))
+        goal_rect = goal_image.get_rect(center=goal_tile)
         screen.blit(goal_image, goal_rect)
 
 # Initialize first level
 map_layout = load_level(current_level_index)
 
 walls, walkable_tiles = create_map(map_layout)
+
+def game_over_screen():
+    """Display the Game Over screen and allow the user to restart or quit."""
+    font = pygame.font.Font(None, 74)
+    small_font = pygame.font.Font(None, 50)
+    screen.fill((0, 0, 0))
+
+    # Render text
+    text = font.render("Game Over", True, (255, 0, 0))
+    screen.blit(text, (WIDTH // 2 - text.get_width() // 2, HEIGHT // 3))
+
+    restart_text = small_font.render("Press R to Restart", True, (255, 255, 255))
+    screen.blit(restart_text, (WIDTH // 2 - restart_text.get_width() // 2, HEIGHT // 2))
+
+    quit_text = small_font.render("Press Q to Quit", True, (255, 255, 255))
+    screen.blit(quit_text, (WIDTH // 2 - quit_text.get_width() // 2, HEIGHT // 2 + 60))
+
+    pygame.display.flip()
+
+    # Wait for user input
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_r:  # Restart the game
+                    return True
+                elif event.key == pygame.K_q:  # Quit the game
+                    pygame.quit()
+                    sys.exit()
 
 # Initialize player and tracker
 player_tile, tracker_tile = random.sample(walkable_tiles, 2)
@@ -142,13 +192,15 @@ while running:
     tracker.update(dt, player, map_layout, walkable_tiles)
 
     # Check for collision between player and tracker
-    if pygame.sprite.collide_rect(player, tracker):  # Check if player and tracker collide
+    if pygame.sprite.collide_rect(player, tracker):
         screen.fill((0, 0, 0))  # Clear screen
         screen.blit(jumpscare_image, (WIDTH // 2 - jumpscare_image.get_width() // 2, HEIGHT // 2 - jumpscare_image.get_height() // 2))
-        pygame.display.flip()
-        pygame.time.wait(500)  # Show jumpscare for 0.5 seconds
-        pygame.quit()
-        sys.exit()
+        game_over = game_over_screen()  # Display Game Over screen
+        if game_over:
+            current_level_index = 0  # Reset to the first level
+            map_layout = load_level(current_level_index)  # Reload the first level
+            player.rect.topleft = (walkable_tiles[0][2], walkable_tiles[0][3])  # Reset player position
+            tracker.rect.topleft = (walkable_tiles[1][2], walkable_tiles[1][3])  # Reset tracker position
 
     # Check for level transition
     player_tile = (player.rect.centery // TILE_SIZE, player.rect.centerx // TILE_SIZE)
@@ -176,8 +228,8 @@ while running:
     visibility_gradient = create_radial_gradient(VISIBILITY_RADIUS, time_factor)
 
     # Update the fog effect
-    update_darkness(player.rect.center, visibility_gradient, darkness, time_factor)
-    screen.blit(darkness, (0, 0))
+    #update_darkness(player.rect.center, visibility_gradient, darkness, time_factor)
+    #screen.blit(darkness, (0, 0))
 
     # Draw radar (after main elements)
     draw_radar(screen, player.rect.center, tracker.rect.center, RADAR_CENTER, RADAR_RADIUS, sweep_angle)
