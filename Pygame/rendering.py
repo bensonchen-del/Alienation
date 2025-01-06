@@ -34,7 +34,53 @@ def update_darkness(player_pos, visibility_gradient, darkness, time_factor):
     # Position the gradient around the player
     darkness.blit(visibility_gradient, gradient_pos, special_flags=pygame.BLEND_RGBA_SUB)
 
-def draw_radar(screen, player_pos, tracker_pos, radar_center, radar_radius, max_radar_distance=500):
+def draw_radar(screen, player_pos, tracker_pos, radar_center, radar_radius, sweep_angle, max_radar_distance=500):
+    # Create a radar surface with transparency
+    radar_surface = pygame.Surface((radar_radius * 2, radar_radius * 2), pygame.SRCALPHA)
+    radar_surface.set_alpha(200)  # Set transparency (0 fully transparent, 255 fully opaque)
+
+    # Draw radar background
+    pygame.draw.circle(radar_surface, GREEN_DARK + (200,), (radar_radius, radar_radius), radar_radius)
+    
+    # Draw concentric circles
+    for i in range(1, 5):
+        pygame.draw.circle(radar_surface, GREEN_MEDIUM + (200,), (radar_radius, radar_radius), radar_radius * i // 5, 1)
+    
+    # Draw player position as a green dot at the center
+    pygame.draw.circle(radar_surface, GREEN_LIGHT + (255,), (radar_radius, radar_radius), 5)
+    
+    # Calculate tracker position relative to player
+    dx = tracker_pos[0] - player_pos[0]
+    dy = tracker_pos[1] - player_pos[1]
+    distance = math.hypot(dx, dy)
+
+    if 0 < distance <= max_radar_distance:
+        direction_x = dx / distance
+        direction_y = dy / distance
+        scaled_distance = min(distance / max_radar_distance * radar_radius, radar_radius)
+
+        tracker_radar_x = radar_radius + direction_x * scaled_distance
+        tracker_radar_y = radar_radius + direction_y * scaled_distance
+
+        # Draw tracker position as a white dot
+        pygame.draw.circle(radar_surface, WHITE + (255,), (int(tracker_radar_x), int(tracker_radar_y)), 7)
+    
+    # Draw the sweeping line
+    # Convert angle from degrees to radians
+    angle_rad = math.radians(sweep_angle)
+    
+    # Calculate the end point of the sweep line
+    end_x = radar_radius + radar_radius * math.cos(angle_rad)
+    end_y = radar_radius + radar_radius * math.sin(angle_rad)
+    
+    # Draw the sweep line with a semi-transparent color
+    pygame.draw.line(radar_surface, WHITE + (150,), (radar_radius, radar_radius), (end_x, end_y), 2)
+    
+    # Optional: Add a fading effect to the sweep line
+    # You can achieve this by drawing a semi-transparent arc or using gradients
+
+    # Blit the radar surface onto the main screen
+    screen.blit(radar_surface, (radar_center[0] - radar_radius, radar_center[1] - radar_radius))
     # 創建一個帶透明度的雷達表面
     radar_surface = pygame.Surface((radar_radius * 2, radar_radius * 2), pygame.SRCALPHA)
     radar_surface.set_alpha(200)  # 設置透明度（0 完全透明，255 完全不透明）

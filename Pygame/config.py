@@ -12,7 +12,7 @@ WAITING_DURATION = 5.0  # 等待狀態持續時間（秒）
 WANDER_SPEED = 100  # 游蕩模式速度
 FOLLOW_SPEED = 300  # 追蹤模式速度
 RUN_SPEED = 250  # 玩家奔跑速度
-SNEAK_SPEED = 75  # 玩家潛行速度
+SNEAK_SPEED = 50  # 玩家潛行速度
 VISIBILITY_RADIUS = 200  # 玩家可見區域半徑
 MIN_TARGET_DISTANCE = 100  # 追蹤者與目標之間的最小距離
 
@@ -21,9 +21,13 @@ WHITE = (50, 60, 60)  # 白色背景
 BLACK = (30, 30, 35)  # 色牆壁
 BLUE = (0, 0, 255)  # 游蕩狀態
 GREEN = (0, 255, 0)  # 追蹤狀態
+GREEN_DARK = (0, 50, 0)
+GREEN_MEDIUM = (0, 100, 0)
+GREEN_LIGHT = (0, 255, 0)
 YELLOW = (255, 255, 0)  # 等待狀態
 RED = (160, 160, 0)  # 玩家
 
 # Radar settings
 RADAR_CENTER = (WIDTH - 250, 250)  # Position on screen
 RADAR_RADIUS = 200
+SWEEP_SPEED = 120  # Degrees per second

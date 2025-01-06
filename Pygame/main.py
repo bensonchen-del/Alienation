@@ -36,6 +36,8 @@ pygame.mixer.music.play(-1)  # Loop background sound infinitely
 
 time_factor = 0  # Time factor for dynamic effects
 
+sweep_angle = 0
+
 running = True
 while running:
     dt = clock.tick(FPS) / 1000
@@ -87,6 +89,9 @@ while running:
     if not collision_y:
         player.rect.y = new_player_y
 
+    # Update sweep angle
+    sweep_angle = (sweep_angle + SWEEP_SPEED * dt) % 360  # Rotate 1 degree per frame
+
     # Tracker logic based on adjusted DISTANCE_THRESHOLD
     distance = math.hypot(player.rect.centerx - tracker.rect.centerx, player.rect.centery - tracker.rect.centery)
     if distance > current_distance_threshold and tracker.state != 'wander':
@@ -125,7 +130,7 @@ while running:
     screen.blit(darkness, (0, 0))
 
     # Draw radar (after main elements)
-    draw_radar(screen, player.rect.center, tracker.rect.center, RADAR_CENTER, RADAR_RADIUS)
+    draw_radar(screen, player.rect.center, tracker.rect.center, RADAR_CENTER, RADAR_RADIUS, sweep_angle)
 
     pygame.display.flip()
 
